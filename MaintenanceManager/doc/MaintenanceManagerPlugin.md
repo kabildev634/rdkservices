@@ -6,13 +6,14 @@
 
 **Status: :black_circle::black_circle::black_circle:**
 
-org.rdk.MaintenanceManager plugin for Thunder framework.
+A org.rdk.MaintenanceManager plugin for Thunder framework.
 
 ### Table of Contents
 
 - [Introduction](#head.Introduction)
 - [Description](#head.Description)
 - [Configuration](#head.Configuration)
+- [Interfaces](#head.Interfaces)
 - [Methods](#head.Methods)
 - [Notifications](#head.Notifications)
 
@@ -76,6 +77,13 @@ The table below lists configuration options of the plugin.
 | locator | string | Library name: *libWPEFrameworkMaintenanceManager.so* |
 | autostart | boolean | Determines if the plugin shall be started automatically along with the framework |
 
+<a name="head.Interfaces"></a>
+# Interfaces
+
+This plugin implements the following interfaces:
+
+- [MaintenanceManager.json](https://github.com/rdkcentral/ThunderInterfaces/tree/master/interfaces/MaintenanceManager.json)
+
 <a name="head.Methods"></a>
 # Methods
 
@@ -89,10 +97,11 @@ MaintenanceManager interface methods:
 | [getMaintenanceStartTime](#method.getMaintenanceStartTime) | Gets the scheduled maintenance start time |
 | [setMaintenanceMode](#method.setMaintenanceMode) | Sets the maintenance mode |
 | [startMaintenance](#method.startMaintenance) | Starts maintenance activities |
+| [stopMaintenance](#method.stopMaintenance) | Stops maintenance activities |
 
 
 <a name="method.getMaintenanceActivityStatus"></a>
-## *getMaintenanceActivityStatus <sup>method</sup>*
+## *getMaintenanceActivityStatus [<sup>method</sup>](#head.Methods)*
 
 Gets the maintenance activity status details.  
 **Maintenance Statuses**  
@@ -100,7 +109,11 @@ Gets the maintenance activity status details.
 * `MAINTENANCE_STARTED` - Sent immediately on maintenance startup either scheduled or on boot  
 * `MAINTENANCE_ERROR` - Sent after receiving error notification while executing any of the maintenance activities  
 * `MAINTENANCE_COMPLETE` - Sent after receiving `*_COMPLETE` notification from all critical maintenance tasks  
-* `MAINTENANCE_INCOMPLETE` - Sent whenever the Maintenance service doesn't execute one or more of the tasks. `MAINTENANCE_ERROR` is returned even if only one task returns error.
+* `MAINTENANCE_INCOMPLETE` - Sent whenever the Maintenance service doesn't execute one or more of the tasks. `MAINTENANCE_ERROR` is returned even if only one task returns error. 
+ 
+### Events
+ 
+ No Events.
 
 ### Parameters
 
@@ -112,7 +125,7 @@ This method takes no parameters.
 | :-------- | :-------- | :-------- |
 | result | object |  |
 | result.maintenanceStatus | string | The current maintenance status |
-| result.lastSuccessfulCompletionTime | integer | The time the last maintenance completed or `0` if not applicable |
+| result?.LastSuccessfulCompletionTime | integer | <sup>*(optional)*</sup> The time the last maintenance completed or `0` if not applicable |
 | result.isCriticalMaintenance | boolean | `true` if the maintenance activity cannot be aborted, otherwise `false` |
 | result.isRebootPending | boolean | `true` if the device is going to reboot, otherwise `false` |
 | result.success | boolean | Whether the request succeeded |
@@ -124,7 +137,7 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "method": "org.rdk.MaintenanceManager.1.getMaintenanceActivityStatus"
 }
 ```
@@ -134,10 +147,10 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "result": {
         "maintenanceStatus": "MAINTENANCE_STARTED",
-        "lastSuccessfulCompletionTime": 12345678,
+        "LastSuccessfulCompletionTime": 12345678,
         "isCriticalMaintenance": true,
         "isRebootPending": false,
         "success": true
@@ -146,9 +159,13 @@ This method takes no parameters.
 ```
 
 <a name="method.getMaintenanceStartTime"></a>
-## *getMaintenanceStartTime <sup>method</sup>*
+## *getMaintenanceStartTime [<sup>method</sup>](#head.Methods)*
 
-Gets the scheduled maintenance start time.
+Gets the scheduled maintenance start time. 
+ 
+### Events
+ 
+ No Events.
 
 ### Parameters
 
@@ -169,7 +186,7 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "method": "org.rdk.MaintenanceManager.1.getMaintenanceStartTime"
 }
 ```
@@ -179,7 +196,7 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "result": {
         "maintenanceStartTime": 12345678,
         "success": true
@@ -188,16 +205,20 @@ This method takes no parameters.
 ```
 
 <a name="method.setMaintenanceMode"></a>
-## *setMaintenanceMode <sup>method</sup>*
+## *setMaintenanceMode [<sup>method</sup>](#head.Methods)*
 
-Sets the maintenance mode.
+Sets the maintenance mode. 
+ 
+### Events
+ 
+ No Events.
 
 ### Parameters
 
 | Name | Type | Description |
 | :-------- | :-------- | :-------- |
 | params | object |  |
-| params.maintenanceMode | string | The maintenance mode. The `FOREGROUND` mode runs all maintenance tasks. The `BACKGROUND` mode runs maintenance tasks that do not impact the user experience. (must be one of the following: *FOREGROUND*, *BACKGROUND*) |
+| params.maintenanceMode | string | The maintenance mode. The `FOREGROUND` mode runs all maintenance tasks. The `BACKGROUND` mode runs maintenance tasks that do not impact the user experience. If the mode is not set then, it returns `SysSrv Status` and `errorMessage` (must be one of the following: *FOREGROUND*, *BACKGROUND*) |
 
 ### Result
 
@@ -213,7 +234,7 @@ Sets the maintenance mode.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "method": "org.rdk.MaintenanceManager.1.setMaintenanceMode",
     "params": {
         "maintenanceMode": "BACKGROUND"
@@ -226,7 +247,7 @@ Sets the maintenance mode.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "result": {
         "success": true
     }
@@ -234,9 +255,16 @@ Sets the maintenance mode.
 ```
 
 <a name="method.startMaintenance"></a>
-## *startMaintenance <sup>method</sup>*
+## *startMaintenance [<sup>method</sup>](#head.Methods)*
 
-Starts maintenance activities.
+Starts maintenance activities. 
+ 
+### Events 
+| Event | Description | 
+| :----------- | :----------- |
+| `onMaintenanceStatusChange` | Triggers when the maintenance status changed to `MAINTENANCE_STARTED` |.
+
+Also see: [onMaintenanceStatusChange](#event.onMaintenanceStatusChange)
 
 ### Parameters
 
@@ -256,7 +284,7 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
     "method": "org.rdk.MaintenanceManager.1.startMaintenance"
 }
 ```
@@ -266,7 +294,54 @@ This method takes no parameters.
 ```json
 {
     "jsonrpc": "2.0",
-    "id": 1234567890,
+    "id": 42,
+    "result": {
+        "success": true
+    }
+}
+```
+
+<a name="method.stopMaintenance"></a>
+## *stopMaintenance [<sup>method</sup>](#head.Methods)*
+
+Stops maintenance activities. 
+ 
+### Events 
+| Event | Description | 
+| :----------- | :----------- |
+| `onMaintenanceStatusChange` | Triggers when the maintenance status changed to `MAINTENANCE_ERROR` |.
+
+Also see: [onMaintenanceStatusChange](#event.onMaintenanceStatusChange)
+
+### Parameters
+
+This method takes no parameters.
+
+### Result
+
+| Name | Type | Description |
+| :-------- | :-------- | :-------- |
+| result | object |  |
+| result.success | boolean | Whether the request succeeded |
+
+### Example
+
+#### Request
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": 42,
+    "method": "org.rdk.MaintenanceManager.1.stopMaintenance"
+}
+```
+
+#### Response
+
+```json
+{
+    "jsonrpc": "2.0",
+    "id": 42,
     "result": {
         "success": true
     }
@@ -288,7 +363,7 @@ MaintenanceManager interface events:
 
 
 <a name="event.onMaintenanceStatusChange"></a>
-## *onMaintenanceStatusChange <sup>event</sup>*
+## *onMaintenanceStatusChange [<sup>event</sup>](#head.Notifications)*
 
 Triggered when the maintenance manager status changes. See `getMaintenanceActivityStatus` for a list of statuses.
 

@@ -31,14 +31,14 @@
     },
     "methods": {
         "getMaintenanceActivityStatus" :{
-            "summary": "Gets the maintenance activity status details.  \n**Maintenance Statuses**  \n* `MAINTENANCE_IDLE` - Sent when the Maintenance service is not executing any activities and until the first maintenance task is started  \n* `MAINTENANCE_STARTED` - Sent immediately on maintenance startup either scheduled or on boot  \n* `MAINTENANCE_ERROR` - Sent after receiving error notification while executing any of the maintenance activities  \n* `MAINTENANCE_COMPLETE` - Sent after receiving `*_COMPLETE` notification from all critical maintenance tasks  \n* `MAINTENANCE_INCOMPLETE` - Sent whenever the Maintenance service doesn't execute one or more of the tasks. `MAINTENANCE_ERROR` is returned even if only one task returns error.",
+            "summary": "Gets the maintenance activity status details.  \n**Maintenance Statuses**  \n* `MAINTENANCE_IDLE` - Sent when the Maintenance service is not executing any activities and until the first maintenance task is started  \n* `MAINTENANCE_STARTED` - Sent immediately on maintenance startup either scheduled or on boot  \n* `MAINTENANCE_ERROR` - Sent after receiving error notification while executing any of the maintenance activities  \n* `MAINTENANCE_COMPLETE` - Sent after receiving `*_COMPLETE` notification from all critical maintenance tasks  \n* `MAINTENANCE_INCOMPLETE` - Sent whenever the Maintenance service doesn't execute one or more of the tasks. `MAINTENANCE_ERROR` is returned even if only one task returns error. \n \n### Events\n \n No Events.",
             "result": {
                 "type": "object",
                 "properties": {
                     "maintenanceStatus":{
                         "$ref": "#/definitions/maintenanceStatus" 
                     },
-                    "lastSuccessfulCompletionTime":{
+                    "LastSuccessfulCompletionTime":{
                         "summary": "The time the last maintenance completed or `0` if not applicable",
                         "type": "integer",
                         "example": 12345678
@@ -67,7 +67,7 @@
             }
         },
         "getMaintenanceStartTime":{
-            "summary": "Gets the scheduled maintenance start time",
+            "summary": "Gets the scheduled maintenance start time. \n \n### Events\n \n No Events.",
             "result": {
                 "type": "object",
                 "properties": {
@@ -87,12 +87,12 @@
             }
         },
         "setMaintenanceMode":{
-            "summary": "Sets the maintenance mode",
+            "summary": "Sets the maintenance mode. \n \n### Events\n \n No Events.",
             "params": {
                 "type":"object",
                 "properties": {
                     "maintenanceMode":{
-                        "summary": "The maintenance mode. The `FOREGROUND` mode runs all maintenance tasks. The `BACKGROUND` mode runs maintenance tasks that do not impact the user experience.",
+                        "summary": "The maintenance mode. The `FOREGROUND` mode runs all maintenance tasks. The `BACKGROUND` mode runs maintenance tasks that do not impact the user experience. If the mode is not set then, it returns `SysSrv Status` and `errorMessage`",
                         "enum": [
                             "FOREGROUND",
                             "BACKGROUND"
@@ -110,7 +110,15 @@
             }
         },
         "startMaintenance":{
-            "summary": "Starts maintenance activities",
+            "summary": "Starts maintenance activities. \n \n### Events \n| Event | Description | \n| :----------- | :----------- |\n| `onMaintenanceStatusChange` | Triggers when the maintenance status changed to `MAINTENANCE_STARTED` |.",
+            "events": ["onMaintenanceStatusChange"],
+            "result": {
+                "$ref": "#/definitions/result"
+            }          
+        },
+        "stopMaintenance":{
+            "summary": "Stops maintenance activities. \n \n### Events \n| Event | Description | \n| :----------- | :----------- |\n| `onMaintenanceStatusChange` | Triggers when the maintenance status changed to `MAINTENANCE_ERROR` |.",
+            "events": ["onMaintenanceStatusChange"],
             "result": {
                 "$ref": "#/definitions/result"
             }          
